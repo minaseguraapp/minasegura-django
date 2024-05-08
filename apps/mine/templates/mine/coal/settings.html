@@ -1,0 +1,130 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+{% block title %}Configuración | Polvo de carbón{% endblock %}
+
+{% block extra_content %}
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Configuración de alertas - Polvo de carbón</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="content">
+        <div class="container-fluid">
+            <form class="form-horizontal" action="" method="post">
+                <div class="row">
+                    <div class="col-md-6 offset-md-3">
+                        <div class="card card-primary">
+                            <div class="card-header d-flex justify-content-center">
+                                <h3 class="card-title">Limites de alerta</h3>
+                            </div>
+
+                            {% csrf_token %}
+                            <div class="card-body">
+                                <div class="form-group row d-flex">
+                                    <div class="col-sm-8 text-center align-self-center">
+                                        <h4>Sitio</h4>
+                                    </div>
+                                    <div class="col-sm-4 text-center align-self-center">
+                                        <h4>
+                                            <small>
+                                                Porcentaje (%) Máximo permisible
+                                                de polvo de carbón
+                                            </small>
+                                        </h4>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="maxDustLevel"
+                                           class="col-sm-8 col-form-label">Máxima concentración de polvo de
+                                        carbon</label>
+                                    <div class="col-sm-4">
+                                        <input type="number" step="0.01" class="form-control"
+                                               name="max_dust_level"
+                                               value="{{ settings.thresholdInfo.maxDustLevel }}"
+                                               placeholder="0.0"
+                                               id="maxDustLevel">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="maxParticleSize"
+                                           class="col-sm-8 col-form-label">Máximo tamaño de particula
+                                        (granulometría)</label>
+                                    <div class="col-sm-4">
+                                        <input type="number" step="0.01" class="form-control"
+                                               name="max_particle_size"
+                                               value="{{ settings.thresholdInfo.maxParticleSize }}"
+                                               placeholder="0.0"
+                                               id="maxParticleSize">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-primary float-right">Guardar</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 offset-md-3">
+                        <div class="card card-primary">
+                            <div class="card-header d-flex justify-content-center">
+                                <h3 class="card-title">Configuración Notificación</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Correo</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        </div>
+                                        <input type="email" class="form-control" id="exampleInputEmail1"
+                                               name="email"
+                                               value="{{ notification_settings.notificationInfo.email }}"
+                                               placeholder="Ingrese el correo">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Telefono</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control"
+                                               id="cellphone"
+                                               name="cellphone"
+                                               value="{{ notification_settings.notificationInfo.cellphone }}"
+                                               data-mask="" inputmode="text">
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-primary  float-right">Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock extra_content %}
+{% block extra_js %}
+    <script src="{% static 'plugins/inputmask/jquery.inputmask.min.js' %}"></script>
+    <script>
+        $(function () {
+            $('#cellphone').inputmask('(999) 999-9999',
+                {
+                    numericInput: true,
+                    removeMaskOnSubmit: true
+                }
+            );
+        });
+    </script>
+{% endblock %}

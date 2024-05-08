@@ -1,0 +1,139 @@
+{% extends 'dashboard_base.html' %}
+{% load static mine_tags %}
+{% block title %}Medición | Gas Metano{% endblock %}
+
+{% block extra_content %}
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-8">
+                    <h1>Medición - Gas Metano</h1>
+                </div>
+                <div class="col-sm-4">
+                    <button type="button" class="btn btn-primary float-right" data-toggle="modal"
+                            data-target="#modal-md">
+                        <i class="fas fa-plus"></i>
+                        Nueva Medición
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Lista de mediciones</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                            <table id="example1" class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Código de zona</th>
+                                    <th>Tipo de zona</th>
+                                    <th>Area de medición</th>
+                                    <th>Concentración de metano</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for measurement in  measurement_list %}
+                                    <tr>
+                                        <td>{{ measurement.timestamp|timestamp_to_time|date:"d/m/Y - f A" }}</td>
+                                        {% get_zone measurement.zone.id as zone %}
+                                        <td>{{ zone }}</td>
+                                        <td>{{ zone.zone_type }}</td>
+                                        <td>{{ measurement.measurementInfo.measurementSite|measurement_site }}</td>
+                                        <td>{{ measurement.measurementInfo.methaneLevel }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-md">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h4 class="modal-title">Nueva medición</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% include 'mine/gas/forms/new_measurement.html' with measurement_site_choice=measurement_site_choice %}
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+{% endblock extra_content %}
+{% block extra_js %}
+    <script src="{% static 'plugins/select2/js/select2.full.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/pdfmake.min.js' %}"></script>
+    <script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+    <script>
+        $(function () {
+            let table = $("#example1").DataTable({
+                order: [[0, 'desc']],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json',
+                },
+                "responsive": true, "lengthChange": false, "autoWidth": false,
+                initComplete: function () {
+                    setTimeout(function () {
+                        table.buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+                    }, 10);
+                },
+                "buttons": ["excel", "pdf", "print", "colvis"]
+            })
+        });
+        $('#zoneSelect').select2({
+            theme: 'bootstrap4',
+            ajax: {
+                url: "{% url 'mine:measurement_site_select' user_mine.id %}",
+                dataType: 'json',
+                processResults: function (data) {
+                    const results = data?.zones?.map(zone => {
+                        return {
+                            id: zone.id,
+                            text: zone.name
+                        }
+                    });
+                    return {
+                        results: results
+                    };
+                }
+            }
+        })
+        $('#siteSelect').select2({
+            theme: 'bootstrap4'
+        });
+    </script>
+{% endblock %}

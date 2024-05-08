@@ -1,0 +1,219 @@
+{% extends 'dashboard_base.html' %}
+{% load static mine_tags %}
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_content %}
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Dashboard</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="content">
+        <div class="row px-md-4">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+
+                        <h3 class="card-title"><i class="fas fa-exclamation-triangle"></i> Alertas Recientes </h3>
+                    </div>
+                    <div class="card-body p-0" style="height: 400px; overflow: auto">
+                        <div class="table-responsive">
+                            <table class="table table-sm text-center">
+                                <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Tipo de medición</th>
+                                    <th>Valores de alerta</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for alert in alerts %}
+                                    <tr>
+                                        <td class="align-middle">{{ alert.alertTimestamp|timestamp_to_time|date:"d/m/Y - f A" }}</td>
+                                        <td class="align-middle">
+                                            {% if alert.measurementType == "METHANE" %}
+                                                Gas Metano
+                                            {% elif alert.measurementType == "COAL_DUST" %}
+                                                Polvo de Carbón
+                                            {% else %}
+                                                {{ alert.measurementType }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-bordered text-center">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Nombre del umbral</th>
+                                                        <th>Valor esperado</th>
+                                                        <th>Valor encontrado</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for info in alert.alertInfo %}
+                                                        <tr>
+                                                            <td>
+                                                                {% if alert.measurementType == "METHANE" %}
+                                                                    {{ info.thresholdName|measurement_site }}
+                                                                {% else %}
+                                                                    {{ info.thresholdName|measurement_site_coal }}
+                                                                {% endif %}
+                                                            </td>
+                                                            <td>{{ info.valueExpected }}</td>
+                                                            <td>{{ info.valueFound }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Mantenimientos Próximos</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-striped text-center">
+                            <thead>
+                            <tr>
+                                <th>Equipo</th>
+                                <th>Fecha de ejecución</th>
+                                <th>Descripción</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for maintenance in maintenance_list %}
+                                <tr>
+                                    <td>{{ maintenance.equipment.name }}
+                                        - {{ maintenance.equipment.equipment_type }}
+                                    </td>
+                                    <td>{{ maintenance.execution_date }}</td>
+                                    <td>{{ maintenance.description }}</td>
+
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Grafico de alertas</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart">
+                            <div class="chartjs-size-monitor">
+                                <div class="chartjs-size-monitor-expand">
+                                    <div class=""></div>
+                                </div>
+                                <div class="chartjs-size-monitor-shrink">
+                                    <div class=""></div>
+                                </div>
+                            </div>
+                            <canvas id="lineChart"
+                                    style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block; width: 765px;"
+                                    width="765" height="250" class="chartjs-render-monitor"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock extra_content %}
+{% block extra_js %}
+    <script src="{% static 'plugins/chart.js/Chart.min.js' %}"></script>
+    <script>
+
+        $(function () {
+            let chartData = {
+                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                datasets: [
+                    {
+                        label: 'Digital Goods',
+                        backgroundColor: 'rgba(60,141,188,0.9)',
+                        borderColor: 'rgba(60,141,188,0.8)',
+                        pointRadius: false,
+                        pointColor: '#3b8bba',
+                        pointStrokeColor: 'rgba(60,141,188,1)',
+                        pointHighlightFill: '#fff',
+                        pointHighlightStroke: 'rgba(60,141,188,1)',
+                        data: [28, 48, 40, 19, 86, 27, 90]
+                    },
+                    {
+                        label: 'Electronics',
+                        backgroundColor: 'rgba(210, 214, 222, 1)',
+                        borderColor: 'rgba(210, 214, 222, 1)',
+                        pointRadius: false,
+                        pointColor: 'rgba(210, 214, 222, 1)',
+                        pointStrokeColor: '#c1c7d1',
+                        pointHighlightFill: '#fff',
+                        pointHighlightStroke: 'rgba(220,220,220,1)',
+                        data: [65, 59, 80, 81, 56, 55, 40]
+                    },
+                ]
+            }
+
+            let chartOptions = {
+                maintainAspectRatio: false,
+                responsive: true,
+                legend: {
+                    display: false
+                },
+                scales: {
+                    xAxes: [{
+                        gridLines: {
+                            display: false,
+                        }
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            display: false,
+                        }
+                    }]
+                }
+            }
+
+            //-------------
+            //- LINE CHART -
+            //--------------
+            let lineChartCanvas = $('#lineChart').get(0).getContext('2d')
+            let lineChartOptions = $.extend(true, {}, chartOptions)
+            let lineChartData = $.extend(true, {}, chartData)
+            lineChartData.datasets[0].fill = false;
+            lineChartData.datasets[1].fill = false;
+            lineChartOptions.datasetFill = false
+
+            let lineChart = new Chart(lineChartCanvas, {
+                type: 'line',
+                data: lineChartData,
+                options: lineChartOptions
+            })
+
+        })
+    </script>
+{% endblock %}

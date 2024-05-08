@@ -1,0 +1,145 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+{% block title %}Configuración | Gas Metano{% endblock %}
+
+{% block extra_content %}
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Configuración de alertas - Gas Metano</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="content">
+        <div class="container-fluid">
+            <form class="form-horizontal" action="" method="post">
+                <div class="row">
+                    <div class="col-md-6 offset-md-3">
+                        <div class="card card-primary">
+                            <div class="card-header d-flex justify-content-center">
+                                <h3 class="card-title">Limites de alerta</h3>
+                            </div>
+                            {% csrf_token %}
+                            <div class="card-body">
+                                <div class="form-group row d-flex">
+                                    <div class="col-sm-8 text-center align-self-center">
+                                        <h4>Sitio</h4>
+                                    </div>
+                                    <div class="col-sm-4 text-center align-self-center">
+                                        <h4>
+                                            <small>
+                                                Porcentaje (%) Máximo permisible
+                                                de metano
+                                            </small>
+                                        </h4>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="miningOperationsMaxMethaneLevel"
+                                           class="col-sm-8 col-form-label">En labores o frentes de explotación</label>
+                                    <div class="col-sm-4">
+                                        <input type="number" step="0.01" class="form-control"
+                                               name="mining_operations_max_methane_level"
+                                               value="{{ settings.thresholdInfo.miningOperationsMaxMethaneLevel }}"
+                                               placeholder="0.0"
+                                               id="miningOperationsMaxMethaneLevel">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="mainAirReturnMaxMethaneLevel"
+                                           class="col-sm-8 col-form-label">En los retornos principales de aire</label>
+                                    <div class="col-sm-4">
+                                        <input type="number" step="0.01" class="form-control"
+                                               name="main_air_return_max_methane_level"
+                                               value="{{ settings.thresholdInfo.mainAirReturnMaxMethaneLevel }}"
+                                               placeholder="0.0"
+                                               id="mainAirReturnMaxMethaneLevel">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="airReturnFromStallsMaxMethaneLevel"
+                                           class="col-sm-8 col-form-label">En el retorno de aire de los tajos</label>
+                                    <div class="col-sm-4">
+                                        <input type="number" step="0.01" class="form-control"
+                                               name="air_return_from_stalls_max_methane_level"
+                                               value="{{ settings.thresholdInfo.airReturnFromStallsMaxMethaneLevel }}"
+                                               placeholder="0.0"
+                                               id="airReturnFromStallsMaxMethaneLevel">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="airReturnFromPrepAndDevMaxMethaneLevel"
+                                           class="col-sm-8 col-form-label">En el retorno de aire de los frentes de
+                                        preparación y desarrollo</label>
+                                    <div class="col-sm-4">
+                                        <input type="number" step="0.01" class="form-control"
+                                               name="air_return_from_prep_and_dev_max_methane_level"
+                                               value="{{ settings.thresholdInfo.airReturnFromPrepAndDevMaxMethaneLevel }}"
+                                               placeholder="0.0"
+                                               id="airReturnFromPrepAndDevMaxMethaneLevel">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-primary float-right">Guardar</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 offset-md-3">
+                        <div class="card card-primary">
+                            <div class="card-header d-flex justify-content-center">
+                                <h3 class="card-title">Configuración Notificación</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Correo</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        </div>
+                                        <input type="email" class="form-control" id="exampleInputEmail1"
+                                               name="email"
+                                               value="{{ notification_settings.notificationInfo.email }}"
+                                               placeholder="Ingrese el correo">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Telefono</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control"
+                                               data-inputmask="&quot;mask&quot;: &quot;(999) 999-9999&quot;"
+                                               name="cellphone"
+                                               value="{{ notification_settings.notificationInfo.cellphone }}"
+                                               data-mask="" inputmode="text">
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-primary  float-right">Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock extra_content %}
+{% block extra_js %}
+    <script src="{% static 'plugins/inputmask/jquery.inputmask.min.js' %}"></script>
+    <script>
+        $(function () {
+            $('[data-mask]').inputmask();
+        });
+    </script>
+{% endblock %}
